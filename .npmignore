@@ -1,0 +1,28 @@
+# Source files
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+biome.json
+
+# Examples
+example/
+example-contracts/
+
+# Development
+.git/
+.github/
+node_modules/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

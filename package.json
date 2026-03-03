@@ -1,0 +1,97 @@
+{
+	"name": "@abiregistry/error-decoder",
+	"version": "0.1.0",
+	"description": "Decode Solidity custom errors from revert data. Extracts errors from Foundry/Hardhat artifacts, builds a fast selector registry, and produces human-readable output.",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		},
+		"./extract": {
+			"types": "./dist/extract/index.d.ts",
+			"import": "./dist/extract/index.js",
+			"require": "./dist/extract/index.cjs"
+		},
+		"./decode": {
+			"types": "./dist/decode/index.d.ts",
+			"import": "./dist/decode/index.js",
+			"require": "./dist/decode/index.cjs"
+		},
+		"./format": {
+			"types": "./dist/format/index.d.ts",
+			"import": "./dist/format/index.js",
+			"require": "./dist/format/index.cjs"
+		},
+		"./viem": {
+			"types": "./dist/viem/index.d.ts",
+			"import": "./dist/viem/index.js",
+			"require": "./dist/viem/index.cjs"
+		}
+	},
+	"bin": {
+		"error-decoder": "./dist/cli/generate.js"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"lint": "tsc --noEmit",
+		"format": "biome format --write .",
+		"format:check": "biome check .",
+		"example:generate": "node dist/cli/generate.js generate --foundry ./example-contracts/out --output ./example/generated --contracts",
+		"example": "tsx example/run.ts",
+		"prepublishOnly": "npm run build"
+	},
+	"keywords": [
+		"solidity",
+		"ethereum",
+		"error",
+		"decoder",
+		"custom-error",
+		"revert",
+		"foundry",
+		"viem",
+		"abi",
+		"abiregistry"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/eborrallo/error-decoder.git"
+	},
+	"bugs": {
+		"url": "https://github.com/eborrallo/error-decoder/issues"
+	},
+	"homepage": "https://github.com/eborrallo/error-decoder#readme",
+	"author": "ABI Registry",
+	"license": "MIT",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"peerDependencies": {
+		"viem": ">=2.0.0"
+	},
+	"dependencies": {
+		"chalk": "^5.6.2",
+		"commander": "^14.0.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.5",
+		"@types/node": "^25.3.3",
+		"@viem/anvil": "^0.0.10",
+		"tsup": "^8.5.1",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	}
+}
