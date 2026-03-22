@@ -29,6 +29,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Match package.json to the GitHub release tag (no manual version bump before release).
+      - name: Set package version from release tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VER="${TAG#v}"
+          pnpm version "$VER" --no-git-tag-version --allow-same-version
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
