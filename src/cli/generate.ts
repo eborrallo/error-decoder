@@ -7,6 +7,7 @@ import {
 	type FoundryArtifact,
 } from "../extract/foundryParser.js";
 import type { SolidityErrorABI, SolidityErrorInput } from "../types.js";
+import { writeShortStringCodesFromSolidity } from "../helpers/shortStringCodesGen.js";
 
 const program = new Command();
 
@@ -127,6 +128,7 @@ function generateContracts(
 }
 
 function generateBarrel(
+	outDir: string,
 	contractNames: string[],
 	hasErrorTypes: boolean,
 	hasErrorAbi: boolean,
@@ -140,6 +142,12 @@ function generateBarrel(
 
 	for (const name of contractNames) {
 		lines.push(`export { ${name}ABI, ${name}Bytecode } from "./${name}.js";`);
+	}
+
+	// Client-generated short-string map (optional; see `generate-short-codes` command)
+	const shortCodesPath = path.join(outDir, "shortStringCodes.ts");
+	if (fs.existsSync(shortCodesPath)) {
+		lines.push('export { SHORT_STRING_ERROR_CODES } from "./shortStringCodes.js";');
 	}
 
 	lines.push("");
@@ -229,7 +237,7 @@ program
 		}
 
 		if (opts.contracts || (hasTypes && hasAbi)) {
-			const barrel = generateBarrel(contractNames, hasTypes, hasAbi);
+			const barrel = generateBarrel(outDir, contractNames, hasTypes, hasAbi);
 			const barrelPath = path.join(outDir, "index.ts");
 			fs.writeFileSync(barrelPath, barrel, "utf8");
 			console.log(`Generated barrel:   ${barrelPath}`);
@@ -237,6 +245,41 @@ program
 
 		console.log(`\nTotal unique errors: ${allErrors.length}`);
 		console.log("Done!");
+	});
+
+program
+	.command("generate-short-codes")
+	.description(
+		"Generate a TypeScript map (SHORT_STRING_ERROR_CODES) from Solidity string constants (library, contract, or file-level)",
+	)
+	.option(
+		"-i, --input <paths>",
+		"Solidity file(s): one path, or comma-separated paths to merge (e.g. library + file-level files)",
+		"./ProtocolErrorCodes.sol",
+	)
+	.option(
+		"-o, --output <path>",
+		"Output path for the generated .ts file",
+		"./generated/shortStringCodes.ts",
+	)
+	.action((opts) => {
+		const cwd = process.cwd();
+		const inputPaths = opts.input
+			.split(",")
+			.map((s: string) => s.trim())
+			.filter(Boolean);
+		try {
+			const { count, outputPath } = writeShortStringCodesFromSolidity({
+				inputPaths,
+				outputPath: opts.output,
+				cwd,
+				regenerateHint: `npx error-decoder generate-short-codes -i ${opts.input} -o ${opts.output}`,
+			});
+			console.log(`Wrote ${count} entries → ${outputPath}`);
+		} catch (err) {
+			console.error(err instanceof Error ? err.message : err);
+			process.exit(1);
+		}
 	});
 
 program

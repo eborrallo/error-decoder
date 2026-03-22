@@ -1,6 +1,6 @@
 import { decodeAbiParameters } from "viem";
 import type { ErrorRegistry } from "../abi/errorRegistry.js";
-import type { DecodedError } from "../types.js";
+import type { DecodeRevertOptions, DecodedError } from "../types.js";
 import { PANIC_CODES } from "../types.js";
 
 /**
@@ -12,6 +12,7 @@ import { PANIC_CODES } from "../types.js";
 export function decodeRevertData(
 	data: `0x${string}`,
 	registry: ErrorRegistry,
+	options?: DecodeRevertOptions,
 ): DecodedError | null {
 	if (data.length < 10) return null;
 
@@ -63,6 +64,16 @@ export function decodeRevertData(
 		}
 	}
 
+	if (entry.error.name === "Error" && typeof args.message === "string") {
+		const resolve = options?.resolveShortStringMessage;
+		if (resolve) {
+			const shortDesc = resolve(args.message);
+			if (shortDesc) {
+				decoded.args["_shortStringDescription"] = shortDesc;
+			}
+		}
+	}
+
 	return decoded;
 }
 
@@ -72,9 +83,10 @@ export function decodeRevertData(
 export function tryDecode(
 	data: string,
 	registry: ErrorRegistry,
+	options?: DecodeRevertOptions,
 ): DecodedError | { name: "UnknownError"; selector: string; raw: string } {
 	const hex = data.startsWith("0x") ? data : `0x${data}`;
-	const result = decodeRevertData(hex as `0x${string}`, registry);
+	const result = decodeRevertData(hex as `0x${string}`, registry, options);
 
 	if (result) return result;
 

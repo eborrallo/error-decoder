@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"skipLibCheck": true,
+		"noEmit": true,
+		"baseUrl": ".",
+		"paths": {
+			"@example/*": ["./*"],
+			"@example-contracts/*": ["../example-contracts/*"],
+			"@abiregistry/error-decoder": ["../src/index.ts"],
+			"@abiregistry/error-decoder/*": ["../src/*"]
+		}
+	},
+	"include": ["./**/*.ts"]
+}

@@ -21,7 +21,11 @@ function formatOneline(decoded: DecodedError): string {
 
 	const prefix = decoded.contractName ? `${decoded.contractName}.` : "";
 
-	return `${prefix}${decoded.name}(${args})`;
+	const shortDesc = decoded.args["_shortStringDescription"];
+	const shortSuffix =
+		typeof shortDesc === "string" ? ` [short: ${shortDesc}]` : "";
+
+	return `${prefix}${decoded.name}(${args})${shortSuffix}`;
 }
 
 function formatDetailed(decoded: DecodedError): string {
@@ -44,6 +48,10 @@ function formatDetailed(decoded: DecodedError): string {
 
 	if (decoded.name === "Panic" && decoded.args["_panicDescription"]) {
 		lines.push(`  reason: ${decoded.args["_panicDescription"]}`);
+	}
+
+	if (decoded.name === "Error" && decoded.args["_shortStringDescription"]) {
+		lines.push(`  short: ${decoded.args["_shortStringDescription"]}`);
 	}
 
 	return lines.join("\n");
@@ -70,6 +78,12 @@ function formatColored(decoded: DecodedError): string {
 	if (decoded.name === "Panic" && decoded.args["_panicDescription"]) {
 		lines.push(
 			`  ${chalk.dim("reason:")} ${chalk.magenta(String(decoded.args["_panicDescription"]))}`,
+		);
+	}
+
+	if (decoded.name === "Error" && decoded.args["_shortStringDescription"]) {
+		lines.push(
+			`  ${chalk.dim("short:")} ${chalk.green(String(decoded.args["_shortStringDescription"]))}`,
 		);
 	}
 

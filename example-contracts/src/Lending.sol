@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.30;
+
+import {ProtocolErrorCodes} from "./ProtocolErrorCodes.sol";
 
 contract Lending {
     error PositionNotFound(uint256 positionId);
@@ -48,5 +50,10 @@ contract Lending {
             revert RepayExceedsDebt(positionId, amount, pos.debtAmount);
         }
         pos.debtAmount -= amount;
+    }
+
+    /// @dev Demo: second library short code (`A2`) for on-chain decode checks.
+    function demoShortStringProtocol2() external pure {
+        revert(ProtocolErrorCodes.ErrorText2);
     }
 }

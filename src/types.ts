@@ -38,7 +38,15 @@ export interface ErrorRegistryEntry {
 	contractName?: string;
 }
 
-export interface DecoderOptions {
+/** Resolve short `Error(string)` messages (e.g. `"A1"`) using a client-generated map. */
+export type ShortStringResolveFn = (message: string) => string | null;
+
+export interface DecodeRevertOptions {
+	/** Enrich builtin `Error(string)` with `_shortStringDescription` when the message matches. */
+	resolveShortStringMessage?: ShortStringResolveFn;
+}
+
+export interface DecoderOptions extends DecodeRevertOptions {
 	/** Path to Foundry `out/` directory */
 	foundryOut?: string;
 	/** Path to Hardhat `artifacts/` directory */

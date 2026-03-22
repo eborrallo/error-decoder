@@ -1,9 +1,17 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { encodeAbiParameters, keccak256, toBytes } from "viem";
-import { createDecoder } from "../src/index.js";
+import {
+	createDecoder,
+	createShortStringResolver,
+} from "../src/index.js";
+import { SHORT_STRING_ERROR_CODES } from "../example/generated/shortStringCodes.js";
 
 const FOUNDRY_OUT = path.resolve(__dirname, "../example-contracts/out");
+
+const resolveShortStringMessage = createShortStringResolver(
+	SHORT_STRING_ERROR_CODES,
+);
 
 function encodeError(
 	name: string,
@@ -102,6 +110,41 @@ describe("createDecoder (end-to-end)", () => {
 		expect(result).not.toBeNull();
 		expect(result!.name).toBe("Error");
 		expect(result!.args.message).toBe("not enough ETH");
+	});
+
+	it("should enrich Error(string) with short-code labels from generated map (library A1, file-level P1, library A2)", () => {
+		const decoder = createDecoder({
+			foundryOut: FOUNDRY_OUT,
+			resolveShortStringMessage,
+		});
+
+		const cases: { message: string; label: string }[] = [
+			{ message: "A1", label: "ErrorText1" },
+			{ message: "P1", label: "PlainErrorText1" },
+			{ message: "A2", label: "ErrorText2" },
+		];
+
+		for (const { message, label } of cases) {
+			const data = encodeError("Error", ["string"], [message]);
+			const result = decoder.decode(data);
+			expect(result).not.toBeNull();
+			expect(result!.name).toBe("Error");
+			expect(result!.args.message).toBe(message);
+			expect(result!.args._shortStringDescription).toBe(label);
+		}
+	});
+
+	it("should not set _shortStringDescription for unknown short strings when resolver is used", () => {
+		const decoder = createDecoder({
+			foundryOut: FOUNDRY_OUT,
+			resolveShortStringMessage,
+		});
+
+		const data = encodeError("Error", ["string"], ["not in map"]);
+		const result = decoder.decode(data);
+
+		expect(result!.args.message).toBe("not in map");
+		expect(result!.args._shortStringDescription).toBeUndefined();
 	});
 
 	it("should handle Panic(uint256) with description", () => {

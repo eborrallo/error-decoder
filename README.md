@@ -33,6 +33,7 @@ if (result) {
 - **Foundry & Hardhat support** — scans `out/` or `artifacts/` directories
 - **O(1) selector lookup** — Map-based registry, not linear ABI scan
 - **Builtin error handling** — `Error(string)` and `Panic(uint256)` with human-readable panic descriptions
+- **Short string revert codes** — CLI generates a lookup map in **your** repo; pass `createShortStringResolver(map)` to `createDecoder` / the viem plugin (nothing bundled in the SDK)
 - **Multiple output formats** — one-line, detailed, and ANSI-colored
 - **CLI tool** — generate TypeScript types, contract artifacts, and decode errors from the terminal
 - **Runtime registration** — add ABIs dynamically
@@ -54,6 +55,8 @@ const plugin = errorDecoder({ errorAbis: [ERROR_ABI] });
 const client = createPublicClient({ chain, transport: http() }).extend(plugin);
 const wallet = createWalletClient({ account, chain, transport: http() }).extend(plugin);
 ```
+
+For gas-optimized `Error(string)` short codes, pass `resolveShortStringMessage` (see [Short string revert codes](#short-string-revert-codes)) — same option as `createDecoder`.
 
 ### Usage
 
@@ -126,6 +129,7 @@ const decoder = createDecoder({
   hardhatArtifacts: "./artifacts", // Hardhat artifacts/ path
   abis: [myAbi],                  // Raw ABI arrays
   includeBuiltins: true,           // Error(string), Panic(uint256) — default: true
+  resolveShortStringMessage: createShortStringResolver(SHORT_STRING_ERROR_CODES), // optional, client-generated map
 });
 ```
 
@@ -180,7 +184,15 @@ This creates:
 - `errors.types.ts` — TypeScript interfaces for every custom error
 - `errors.abi.ts` — ABI registry you can import in your code
 - `<ContractName>.ts` — per-contract ABI and bytecode (with `--contracts`)
-- `index.ts` — barrel file re-exporting everything
+- `index.ts` — barrel file re-exporting everything (also re-exports `SHORT_STRING_ERROR_CODES` if you generate `shortStringCodes.ts` into the same output directory first; see `generate-short-codes` below)
+
+### Generate short-string lookup map
+
+```bash
+npx error-decoder generate-short-codes --input ./contracts/Codes.sol --output ./generated/shortStringCodes.ts
+```
+
+See [Short string revert codes](#short-string-revert-codes) for Solidity shapes and merging multiple files.
 
 ### Decode from terminal
 
@@ -248,6 +260,86 @@ Built-in `Panic(uint256)` codes are automatically annotated:
 | 0x32 | Array index out of bounds |
 | 0x41 | Too much memory allocated |
 | 0x51 | Call to zero-initialized internal function |
+
+## Short string revert codes
+
+Contracts sometimes use **short revert strings** (for example `revert("A1")`) to save gas, with the meaning defined beside them in Solidity as `string constant ErrorText1 = "A1";`.
+
+The SDK **does not ship** a generated protocol table — only **CLI** (`generate-short-codes`) and **helpers** (`createShortStringResolver`, Solidity→TS codegen in `src/helpers/`). Generate the map **in your app** (or in this repo under **`example/`**), then pass a resolver into the decoder.
+
+### Layout in this repo
+
+| Path | Role |
+|------|------|
+| `src/cli/` | CLI entry (`error-decoder` binary) |
+| `src/helpers/` | Short-string codegen + `createShortStringResolver` |
+| `example/` | Demos; `example/tsconfig.json` maps `@example/*` → this folder and `@example-contracts/*` → `../example-contracts` |
+| `example/run.ts` | End-to-end script: `createDecoder`, raw `eth_call`, short-string reverts (`npm run example` after generate) |
+| `example/viem_run.ts` | Same contracts via `viem` + `errorDecoder()` (`npx tsx example/viem_run.ts`) |
+| `tests/e2e.test.ts` | Vitest: Foundry `out/` + `SHORT_STRING_ERROR_CODES` on `Error(string)` (`_shortStringDescription`) |
+| `example-contracts/` | Sample Foundry project (`ProtocolErrorCodes.sol` in a `library`, `FileLevelErrorCodes.sol` at file scope) |
+
+**Generate example artifacts (from repo root):** run `forge build` in `example-contracts/`, then `npm run build && npm run example:generate`. That runs `generate:short-codes` (writes `example/generated/shortStringCodes.ts`) and the main `generate` command (error ABI + contract ABIs/bytecode). Then `npm run example` or `npx tsx example/viem_run.ts`.
+
+### CLI: generate `SHORT_STRING_ERROR_CODES`
+
+Supported Solidity shapes (scanner walks the whole file):
+
+- **File-level:** `string constant Name = "A1";` (after `pragma`)
+- **Library / contract:** `string internal|public|private constant Name = "A1";`
+
+Merge multiple files (e.g. library in one file, file-level codes in another) with a **comma-separated** `--input`:
+
+```bash
+npx error-decoder generate-short-codes \
+  --input ./contracts/LibraryCodes.sol,./contracts/FileLevelCodes.sol \
+  --output ./src/generated/shortStringCodes.ts
+```
+
+```bash
+npx error-decoder generate-short-codes \
+  --input ./contracts/ProtocolErrorCodes.sol \
+  --output ./src/generated/shortStringCodes.ts
+```
+
+In this repository, `npm run generate:short-codes` merges **`example-contracts/src/ProtocolErrorCodes.sol`** (library) and **`example-contracts/src/FileLevelErrorCodes.sol`** (file-level) into **`example/generated/shortStringCodes.ts`**.
+
+This writes a module that exports `SHORT_STRING_ERROR_CODES` (short code → constant name). Regenerate whenever the `.sol` file(s) change.
+
+### Use with `createDecoder`
+
+```ts
+import {
+	createDecoder,
+	createShortStringResolver,
+} from "@abiregistry/error-decoder";
+import { SHORT_STRING_ERROR_CODES } from "./generated/shortStringCodes.js";
+// In this repo’s example: `from "@example/generated/shortStringCodes.js"` (see example/tsconfig.json)
+
+const decoder = createDecoder({
+	foundryOut: "./out",
+	resolveShortStringMessage: createShortStringResolver(SHORT_STRING_ERROR_CODES),
+});
+```
+
+### Viem plugin
+
+```ts
+import { errorDecoder } from "@abiregistry/error-decoder/viem";
+import { createShortStringResolver } from "@abiregistry/error-decoder";
+import { SHORT_STRING_ERROR_CODES } from "./generated/shortStringCodes.js";
+
+const plugin = errorDecoder({
+	errorAbis: [ERROR_ABI],
+	resolveShortStringMessage: createShortStringResolver(SHORT_STRING_ERROR_CODES),
+});
+```
+
+When a builtin `Error(string)` message matches a key in your map, decoding adds `_shortStringDescription`, and formatters append a `[short: …]` line.
+
+### Low-level API
+
+`decodeRevertData(data, registry, { resolveShortStringMessage })` accepts the same optional resolver.
 
 ## License
 

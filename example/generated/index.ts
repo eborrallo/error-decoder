@@ -6,3 +6,4 @@ export { ERROR_ABI } from "./errors.abi.js";
 export { DEXABI, DEXBytecode } from "./DEX.js";
 export { LendingABI, LendingBytecode } from "./Lending.js";
 export { VaultABI, VaultBytecode } from "./Vault.js";
+export { SHORT_STRING_ERROR_CODES } from "./shortStringCodes.js";

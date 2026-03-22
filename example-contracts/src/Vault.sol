@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.30;
+
+import {ProtocolErrorCodes} from "./ProtocolErrorCodes.sol";
 
 contract Vault {
     error InsufficientBalance(address user, uint256 requested, uint256 available);
@@ -47,5 +49,10 @@ contract Vault {
         }
         locked = true;
         unlockTime = block.timestamp + duration;
+    }
+
+    /// @dev Demo: short-string revert from `ProtocolErrorCodes` library (`Error(string)` with message `A1`).
+    function demoShortStringProtocol() external pure {
+        revert(ProtocolErrorCodes.ErrorText1);
     }
 }

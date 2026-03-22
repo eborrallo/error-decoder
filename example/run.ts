@@ -3,9 +3,10 @@
  *
  * Build step (run once after forge build):
  *   npx @abiregistry/error-decoder generate --foundry ./example-contracts/out --output ./example/generated --contracts
+ *   npm run example:generate      (runs generate:short-codes first, then error ABI + contract artifacts)
  *
- * Run:
- *   npx tsx example/run.ts
+ * Run (from repo root, uses example/tsconfig.json path aliases):
+ *   npm run example
  */
 
 import { createAnvil } from "@viem/anvil";
@@ -21,18 +22,26 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
-import { createDecoder } from "../src/index.js";
+import {
+	createDecoder,
+	createShortStringResolver,
+} from "@abiregistry/error-decoder";
 
 // Pre-generated at build time — no runtime FS scanning
 import {
 	ERROR_ABI,
+	SHORT_STRING_ERROR_CODES,
 	VaultABI,
 	VaultBytecode,
 	DEXABI,
 	DEXBytecode,
 	LendingABI,
 	LendingBytecode,
-} from "./generated/index.js";
+} from "@example/generated/index.js";
+
+const resolveShortStringMessage = createShortStringResolver(
+	SHORT_STRING_ERROR_CODES,
+);
 
 const deployer = privateKeyToAccount(
 	"0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
@@ -109,6 +118,7 @@ async function main() {
 		console.log("\n[1] Creating decoder from pre-generated ERROR_ABI...");
 		const decoder = createDecoder({
 			abis: [ERROR_ABI as any[]],
+			resolveShortStringMessage,
 		});
 		console.log(`    Registry: ${decoder.registrySize} error selectors loaded`);
 
@@ -140,61 +150,85 @@ async function main() {
 			args: unknown[];
 			opts?: { from?: Hex; value?: bigint };
 		}[] = [
-			{
-				label: "Vault.deposit{ value: 0 }()",
-				to: deployed.Vault,
-				abi: VaultABI,
-				fn: "deposit",
-				args: [],
-				opts: { from: deployer.address, value: 0n },
-			},
-			{
-				label: "Vault.withdraw(1000) — no balance",
-				to: deployed.Vault,
-				abi: VaultABI,
-				fn: "withdraw",
-				args: [1000n],
-				opts: { from: deployer.address },
-			},
-			{
-				label: "Vault.adminWithdraw(1) — wrong sender",
-				to: deployed.Vault,
-				abi: VaultABI,
-				fn: "adminWithdraw",
-				args: [1n],
-				opts: { from: user2.address },
-			},
-			{
-				label: "DEX.swap() — deadline expired",
-				to: deployed.DEX,
-				abi: DEXABI,
-				fn: "swap",
-				args: [
-					"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-					"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-					1000n,
-					1n,
-					1n,
-				],
-				opts: { from: deployer.address },
-			},
-			{
-				label: "Lending.borrow(999, 1000) — no position",
-				to: deployed.Lending,
-				abi: LendingABI,
-				fn: "borrow",
-				args: [999n, 1000n],
-				opts: { from: deployer.address },
-			},
-			{
-				label: "Lending.repay(42, 500) — no position",
-				to: deployed.Lending,
-				abi: LendingABI,
-				fn: "repay",
-				args: [42n, 500n],
-				opts: { from: deployer.address },
-			},
-		];
+				{
+					label: "Vault.demoShortStringProtocol() — Error(string) A1 (library constant)",
+					to: deployed.Vault,
+					abi: VaultABI,
+					fn: "demoShortStringProtocol",
+					args: [],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "DEX.demoShortStringFileLevel() — Error(string) P1 (file-level constant)",
+					to: deployed.DEX,
+					abi: DEXABI,
+					fn: "demoShortStringFileLevel",
+					args: [],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "Lending.demoShortStringProtocol2() — Error(string) A2 (library constant)",
+					to: deployed.Lending,
+					abi: LendingABI,
+					fn: "demoShortStringProtocol2",
+					args: [],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "Vault.deposit{ value: 0 }()",
+					to: deployed.Vault,
+					abi: VaultABI,
+					fn: "deposit",
+					args: [],
+					opts: { from: deployer.address, value: 0n },
+				},
+				{
+					label: "Vault.withdraw(1000) — no balance",
+					to: deployed.Vault,
+					abi: VaultABI,
+					fn: "withdraw",
+					args: [1000n],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "Vault.adminWithdraw(1) — wrong sender",
+					to: deployed.Vault,
+					abi: VaultABI,
+					fn: "adminWithdraw",
+					args: [1n],
+					opts: { from: user2.address },
+				},
+				{
+					label: "DEX.swap() — deadline expired",
+					to: deployed.DEX,
+					abi: DEXABI,
+					fn: "swap",
+					args: [
+						"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+						"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+						1000n,
+						1n,
+						1n,
+					],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "Lending.borrow(999, 1000) — no position",
+					to: deployed.Lending,
+					abi: LendingABI,
+					fn: "borrow",
+					args: [999n, 1000n],
+					opts: { from: deployer.address },
+				},
+				{
+					label: "Lending.repay(42, 500) — no position",
+					to: deployed.Lending,
+					abi: LendingABI,
+					fn: "repay",
+					args: [42n, 500n],
+					opts: { from: deployer.address },
+				},
+			];
 
 		for (const s of scenarios) {
 			separator();
@@ -263,6 +297,25 @@ async function main() {
 		console.log("\n  Panic(uint256) — division by zero:");
 		decoder.decodeAndLog(`${panicSel}${p2.slice(2)}` as Hex);
 
+		// ── Step 5b: Short string reverts (gas-optimized Error(string)) ──
+
+		separator();
+		console.log(
+			"\n[5b] Short revert codes (Error(string) → Solidity constant name):\n",
+		);
+
+		const shortCodes = ["A1", "A2", "A3", "P1", "not-a-code"] as const;
+		for (const code of shortCodes) {
+			const resolved = resolveShortStringMessage(code);
+			console.log(
+				`  short code "${code}" → ${resolved ?? "null"}`,
+			);
+		}
+
+		const shortRevert = encodeAbiParameters([{ type: "string" }], ["A1"]);
+		console.log('\n  Full Error(string) revert for message "A1":');
+		decoder.decodeAndLog(`${errSel}${shortRevert.slice(2)}` as Hex);
+
 		// ── Step 6: Unknown error ──
 
 		separator();
@@ -280,6 +333,7 @@ async function main() {
 }
 
 main().catch((err) => {
+
 	console.error("Fatal error:", err);
 	process.exit(1);
 });

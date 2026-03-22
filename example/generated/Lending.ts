@@ -2,279 +2,285 @@
 // Do not edit manually
 
 export const LendingABI = [
-	{
-		type: "function",
-		name: "borrow",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "amount",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		outputs: [],
-		stateMutability: "nonpayable",
-	},
-	{
-		type: "function",
-		name: "borrowCaps",
-		inputs: [
-			{
-				name: "",
-				type: "address",
-				internalType: "address",
-			},
-		],
-		outputs: [
-			{
-				name: "",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		stateMutability: "view",
-	},
-	{
-		type: "function",
-		name: "nextPositionId",
-		inputs: [],
-		outputs: [
-			{
-				name: "",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		stateMutability: "view",
-	},
-	{
-		type: "function",
-		name: "positions",
-		inputs: [
-			{
-				name: "",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		outputs: [
-			{
-				name: "owner",
-				type: "address",
-				internalType: "address",
-			},
-			{
-				name: "collateral",
-				type: "address",
-				internalType: "address",
-			},
-			{
-				name: "debt",
-				type: "address",
-				internalType: "address",
-			},
-			{
-				name: "collateralAmount",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "debtAmount",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "active",
-				type: "bool",
-				internalType: "bool",
-			},
-		],
-		stateMutability: "view",
-	},
-	{
-		type: "function",
-		name: "repay",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "amount",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		outputs: [],
-		stateMutability: "nonpayable",
-	},
-	{
-		type: "function",
-		name: "supportedCollateral",
-		inputs: [
-			{
-				name: "",
-				type: "address",
-				internalType: "address",
-			},
-		],
-		outputs: [
-			{
-				name: "",
-				type: "bool",
-				internalType: "bool",
-			},
-		],
-		stateMutability: "view",
-	},
-	{
-		type: "function",
-		name: "totalBorrowed",
-		inputs: [
-			{
-				name: "",
-				type: "address",
-				internalType: "address",
-			},
-		],
-		outputs: [
-			{
-				name: "",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-		stateMutability: "view",
-	},
-	{
-		type: "error",
-		name: "BorrowCapExceeded",
-		inputs: [
-			{
-				name: "token",
-				type: "address",
-				internalType: "address",
-			},
-			{
-				name: "cap",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "totalBorrowed",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "CollateralNotSupported",
-		inputs: [
-			{
-				name: "token",
-				type: "address",
-				internalType: "address",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "HealthFactorTooLow",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "healthFactor",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "minHealthFactor",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "LiquidationNotAllowed",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "healthFactor",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "OracleStale",
-		inputs: [
-			{
-				name: "oracle",
-				type: "address",
-				internalType: "address",
-			},
-			{
-				name: "lastUpdate",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "maxAge",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "PositionNotFound",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
-	{
-		type: "error",
-		name: "RepayExceedsDebt",
-		inputs: [
-			{
-				name: "positionId",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "repayAmount",
-				type: "uint256",
-				internalType: "uint256",
-			},
-			{
-				name: "debt",
-				type: "uint256",
-				internalType: "uint256",
-			},
-		],
-	},
+  {
+    "type": "function",
+    "name": "borrow",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "borrowCaps",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "demoShortStringProtocol2",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "nextPositionId",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "positions",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "collateral",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "debt",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "collateralAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "debtAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "active",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "repay",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "supportedCollateral",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalBorrowed",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "error",
+    "name": "BorrowCapExceeded",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "cap",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalBorrowed",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "CollateralNotSupported",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "HealthFactorTooLow",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "healthFactor",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "minHealthFactor",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "LiquidationNotAllowed",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "healthFactor",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OracleStale",
+    "inputs": [
+      {
+        "name": "oracle",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "lastUpdate",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxAge",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "PositionNotFound",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "RepayExceedsDebt",
+    "inputs": [
+      {
+        "name": "positionId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "repayAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "debt",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  }
 ] as const;
 
-export const LendingBytecode =
-	"0x6080604052348015600e575f5ffd5b506108b28061001c5f395ff3fe608060405234801561000f575f5ffd5b506004361061007b575f3560e01c806399fbab881161005957806399fbab88146100e9578063d8aed1451461011e578063e2e1ca2b1461013a578063fa550eba1461016a5761007b565b80630ecbcdab1461007f5780634a5844321461009b578063899346c7146100cb575b5f5ffd5b610099600480360381019061009491906105c8565b61019a565b005b6100b560048036038101906100b09190610660565b6103cf565b6040516100c2919061069a565b60405180910390f35b6100d36103e4565b6040516100e0919061069a565b60405180910390f35b61010360048036038101906100fe91906106b3565b6103ea565b60405161011596959493929190610707565b60405180910390f35b610138600480360381019061013391906105c8565b61048a565b005b610154600480360381019061014f9190610660565b61055f565b604051610161919061069a565b60405180910390f35b610184600480360381019061017f9190610660565b610574565b6040516101919190610766565b60405180910390f35b5f5f5f8481526020019081526020015f209050806005015f9054906101000a900460ff166101ff57826040517ff71548070000000000000000000000000000000000000000000000000000000081526004016101f6919061069a565b60405180910390fd5b5f8260035f846002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205461026c91906107ac565b90505f60025f846002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205490505f811180156102e057508082115b1561034957826002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681836040517f0760acad000000000000000000000000000000000000000000000000000000008152600401610340939291906107df565b60405180910390fd5b83836004015f82825461035c91906107ac565b925050819055508160035f856002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055505050505050565b6002602052805f5260405f205f915090505481565b60045481565b5f602052805f5260405f205f91509050805f015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806001015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806003015490806004015490806005015f9054906101000a900460ff16905086565b5f5f5f8481526020019081526020015f209050806005015f9054906101000a900460ff166104ef57826040517ff71548070000000000000000000000000000000000000000000000000000000081526004016104e6919061069a565b60405180910390fd5b806004015482111561054057828282600401546040517f743a6d5a00000000000000000000000000000000000000000000000000000000815260040161053793929190610814565b60405180910390fd5b81816004015f8282546105539190610849565b92505081905550505050565b6003602052805f5260405f205f915090505481565b6001602052805f5260405f205f915054906101000a900460ff1681565b5f5ffd5b5f819050919050565b6105a781610595565b81146105b1575f5ffd5b50565b5f813590506105c28161059e565b92915050565b5f5f604083850312156105de576105dd610591565b5b5f6105eb858286016105b4565b92505060206105fc858286016105b4565b9150509250929050565b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f61062f82610606565b9050919050565b61063f81610625565b8114610649575f5ffd5b50565b5f8135905061065a81610636565b92915050565b5f6020828403121561067557610674610591565b5b5f6106828482850161064c565b91505092915050565b61069481610595565b82525050565b5f6020820190506106ad5f83018461068b565b92915050565b5f602082840312156106c8576106c7610591565b5b5f6106d5848285016105b4565b91505092915050565b6106e781610625565b82525050565b5f8115159050919050565b610701816106ed565b82525050565b5f60c08201905061071a5f8301896106de565b61072760208301886106de565b61073460408301876106de565b610741606083018661068b565b61074e608083018561068b565b61075b60a08301846106f8565b979650505050505050565b5f6020820190506107795f8301846106f8565b92915050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b5f6107b682610595565b91506107c183610595565b92508282019050808211156107d9576107d861077f565b5b92915050565b5f6060820190506107f25f8301866106de565b6107ff602083018561068b565b61080c604083018461068b565b949350505050565b5f6060820190506108275f83018661068b565b610834602083018561068b565b610841604083018461068b565b949350505050565b5f61085382610595565b915061085e83610595565b92508282039050818111156108765761087561077f565b5b9291505056fea26469706673582212209cbd8fd6fa600d950b44bcf6b7566c57fb1f28d9157e1b7ba39e9e2aa58f70cf64736f6c634300081e0033" as const;
+export const LendingBytecode = "0x6080604052348015600e575f5ffd5b506109c98061001c5f395ff3fe608060405234801561000f575f5ffd5b5060043610610086575f3560e01c8063d2aefe7011610059578063d2aefe7014610129578063d8aed14514610133578063e2e1ca2b1461014f578063fa550eba1461017f57610086565b80630ecbcdab1461008a5780634a584432146100a6578063899346c7146100d657806399fbab88146100f4575b5f5ffd5b6100a4600480360381019061009f919061064f565b6101af565b005b6100c060048036038101906100bb91906106e7565b6103e4565b6040516100cd9190610721565b60405180910390f35b6100de6103f9565b6040516100eb9190610721565b60405180910390f35b61010e6004803603810190610109919061073a565b6103ff565b6040516101209695949392919061078e565b60405180910390f35b61013161049f565b005b61014d6004803603810190610148919061064f565b610511565b005b610169600480360381019061016491906106e7565b6105e6565b6040516101769190610721565b60405180910390f35b610199600480360381019061019491906106e7565b6105fb565b6040516101a691906107ed565b60405180910390f35b5f5f5f8481526020019081526020015f209050806005015f9054906101000a900460ff1661021457826040517ff715480700000000000000000000000000000000000000000000000000000000815260040161020b9190610721565b60405180910390fd5b5f8260035f846002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20546102819190610833565b90505f60025f846002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205490505f811180156102f557508082115b1561035e57826002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681836040517f0760acad00000000000000000000000000000000000000000000000000000000815260040161035593929190610866565b60405180910390fd5b83836004015f8282546103719190610833565b925050819055508160035f856002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055505050505050565b6002602052805f5260405f205f915090505481565b60045481565b5f602052805f5260405f205f91509050805f015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806001015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690806003015490806004015490806005015f9054906101000a900460ff16905086565b6040518060400160405280600281526020017f41320000000000000000000000000000000000000000000000000000000000008152506040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610508919061090b565b60405180910390fd5b5f5f5f8481526020019081526020015f209050806005015f9054906101000a900460ff1661057657826040517ff715480700000000000000000000000000000000000000000000000000000000815260040161056d9190610721565b60405180910390fd5b80600401548211156105c757828282600401546040517f743a6d5a0000000000000000000000000000000000000000000000000000000081526004016105be9392919061092b565b60405180910390fd5b81816004015f8282546105da9190610960565b92505081905550505050565b6003602052805f5260405f205f915090505481565b6001602052805f5260405f205f915054906101000a900460ff1681565b5f5ffd5b5f819050919050565b61062e8161061c565b8114610638575f5ffd5b50565b5f8135905061064981610625565b92915050565b5f5f6040838503121561066557610664610618565b5b5f6106728582860161063b565b92505060206106838582860161063b565b9150509250929050565b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f6106b68261068d565b9050919050565b6106c6816106ac565b81146106d0575f5ffd5b50565b5f813590506106e1816106bd565b92915050565b5f602082840312156106fc576106fb610618565b5b5f610709848285016106d3565b91505092915050565b61071b8161061c565b82525050565b5f6020820190506107345f830184610712565b92915050565b5f6020828403121561074f5761074e610618565b5b5f61075c8482850161063b565b91505092915050565b61076e816106ac565b82525050565b5f8115159050919050565b61078881610774565b82525050565b5f60c0820190506107a15f830189610765565b6107ae6020830188610765565b6107bb6040830187610765565b6107c86060830186610712565b6107d56080830185610712565b6107e260a083018461077f565b979650505050505050565b5f6020820190506108005f83018461077f565b92915050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b5f61083d8261061c565b91506108488361061c565b92508282019050808211156108605761085f610806565b5b92915050565b5f6060820190506108795f830186610765565b6108866020830185610712565b6108936040830184610712565b949350505050565b5f81519050919050565b5f82825260208201905092915050565b8281835e5f83830152505050565b5f601f19601f8301169050919050565b5f6108dd8261089b565b6108e781856108a5565b93506108f78185602086016108b5565b610900816108c3565b840191505092915050565b5f6020820190508181035f83015261092381846108d3565b905092915050565b5f60608201905061093e5f830186610712565b61094b6020830185610712565b6109586040830184610712565b949350505050565b5f61096a8261061c565b91506109758361061c565b925082820390508181111561098d5761098c610806565b5b9291505056fea264697066735822122058a4e1d8b56ff2f29705a9be6d0894d781991b90073cf114eed9c87e29e239b364736f6c634300081e0033" as const;

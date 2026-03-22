@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.30;
+
+import {PlainErrorText1} from "./FileLevelErrorCodes.sol";
 
 contract DEX {
     error PairNotFound(address tokenA, address tokenB);
@@ -48,5 +50,10 @@ contract DEX {
         }
 
         return amountOut;
+    }
+
+    /// @dev Demo: file-level short-string constant (`Error(string)` with message `P1`).
+    function demoShortStringFileLevel() external pure {
+        revert(PlainErrorText1);
     }
 }

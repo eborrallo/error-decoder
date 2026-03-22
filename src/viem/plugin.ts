@@ -15,13 +15,19 @@ import {
 import { ErrorRegistry } from "../abi/errorRegistry.js";
 import { decodeRevertData, tryDecode } from "../decode/decoder.js";
 import { formatError, logError } from "../format/formatter.js";
-import type { DecodedError, FormattedError } from "../types.js";
+import type {
+	DecodedError,
+	FormattedError,
+	ShortStringResolveFn,
+} from "../types.js";
 
 export interface ErrorDecoderPluginOptions {
 	/** Pre-generated error ABI (from the CLI generate command). */
 	errorAbis?: readonly Abi[];
 	/** Include builtin Error(string) and Panic(uint256). Default: true. */
 	includeBuiltins?: boolean;
+	/** Optional: enrich `Error(string)` using a client-generated short-code map. */
+	resolveShortStringMessage?: ShortStringResolveFn;
 }
 
 /**
@@ -76,11 +82,18 @@ function extractRevertDataFromViemError(err: unknown): Hex | null {
 	return null;
 }
 
-function decodeAndThrow(err: unknown, registry: ErrorRegistry): never {
+function decodeAndThrow(
+	err: unknown,
+	registry: ErrorRegistry,
+	resolveShortStringMessage?: ShortStringResolveFn,
+): never {
 	const revertData =
 		extractRevertData(err) ?? extractRevertDataFromViemError(err);
 	if (revertData) {
-		const decoded = decodeRevertData(revertData, registry);
+		const decodeOpts = resolveShortStringMessage
+			? { resolveShortStringMessage }
+			: undefined;
+		const decoded = decodeRevertData(revertData, registry, decodeOpts);
 		if (decoded) throw new DecodedRevertError(decoded, revertData, err);
 	}
 	throw err;
@@ -137,6 +150,10 @@ export interface ErrorDecoderActions {
  */
 export function errorDecoder(options: ErrorDecoderPluginOptions = {}) {
 	const registry = new ErrorRegistry(options.includeBuiltins ?? true);
+	const resolveShort = options.resolveShortStringMessage;
+	const decodeOpts = resolveShort
+		? { resolveShortStringMessage: resolveShort }
+		: undefined;
 
 	if (options.errorAbis) {
 		for (const abi of options.errorAbis) {
@@ -149,7 +166,7 @@ export function errorDecoder(options: ErrorDecoderPluginOptions = {}) {
 			try {
 				return await (client as any).call(params);
 			} catch (err) {
-				decodeAndThrow(err, registry);
+				decodeAndThrow(err, registry, resolveShort);
 			}
 		},
 
@@ -159,7 +176,7 @@ export function errorDecoder(options: ErrorDecoderPluginOptions = {}) {
 			try {
 				return await (client as any).simulateContract(params);
 			} catch (err) {
-				decodeAndThrow(err, registry);
+				decodeAndThrow(err, registry, resolveShort);
 			}
 		},
 
@@ -169,7 +186,7 @@ export function errorDecoder(options: ErrorDecoderPluginOptions = {}) {
 			try {
 				return await (client as any).writeContract(params);
 			} catch (err) {
-				decodeAndThrow(err, registry);
+				decodeAndThrow(err, registry, resolveShort);
 			}
 		},
 
@@ -179,28 +196,28 @@ export function errorDecoder(options: ErrorDecoderPluginOptions = {}) {
 			try {
 				return await (client as any).sendTransaction(params);
 			} catch (err) {
-				decodeAndThrow(err, registry);
+				decodeAndThrow(err, registry, resolveShort);
 			}
 		},
 
 		decodeError(data: Hex): DecodedError | null {
-			return decodeRevertData(data, registry);
+			return decodeRevertData(data, registry, decodeOpts);
 		},
 
 		tryDecodeError(
 			data: string,
 		): DecodedError | { name: "UnknownError"; selector: string; raw: string } {
-			return tryDecode(data, registry);
+			return tryDecode(data, registry, decodeOpts);
 		},
 
 		formatError(data: Hex): FormattedError | null {
-			const decoded = decodeRevertData(data, registry);
+			const decoded = decodeRevertData(data, registry, decodeOpts);
 			if (!decoded) return null;
 			return formatError(decoded);
 		},
 
 		logError(data: Hex): void {
-			const decoded = decodeRevertData(data, registry);
+			const decoded = decodeRevertData(data, registry, decodeOpts);
 			if (!decoded) {
 				console.log(`Unknown error: ${data.slice(0, 10)}...`);
 				return;

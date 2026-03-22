@@ -6,7 +6,12 @@ import {
 	scanHardhatArtifacts,
 } from "./extract/foundryParser.js";
 import { formatError, logError } from "./format/formatter.js";
-import type { DecodedError, DecoderOptions, FormattedError } from "./types.js";
+import type {
+	DecodedError,
+	DecodeRevertOptions,
+	DecoderOptions,
+	FormattedError,
+} from "./types.js";
 
 export interface SolidityErrorDecoder {
 	/** Decode raw revert data. Returns null if no match. */
@@ -47,6 +52,10 @@ export function createDecoder(
 	options: DecoderOptions = {},
 ): SolidityErrorDecoder {
 	const registry = new ErrorRegistry(options.includeBuiltins ?? true);
+	const decodeOpts: DecodeRevertOptions | undefined =
+		options.resolveShortStringMessage
+			? { resolveShortStringMessage: options.resolveShortStringMessage }
+			: undefined;
 
 	if (options.foundryOut) {
 		const artifacts = scanFoundryOut(options.foundryOut);
@@ -70,21 +79,21 @@ export function createDecoder(
 
 	return {
 		decode(data: `0x${string}`): DecodedError | null {
-			return decodeRevertData(data, registry);
+			return decodeRevertData(data, registry, decodeOpts);
 		},
 
 		tryDecode(data: string) {
-			return tryDecode(data, registry);
+			return tryDecode(data, registry, decodeOpts);
 		},
 
 		decodeAndFormat(data: `0x${string}`): FormattedError | null {
-			const decoded = decodeRevertData(data, registry);
+			const decoded = decodeRevertData(data, registry, decodeOpts);
 			if (!decoded) return null;
 			return formatError(decoded);
 		},
 
 		decodeAndLog(data: `0x${string}`): void {
-			const decoded = decodeRevertData(data, registry);
+			const decoded = decodeRevertData(data, registry, decodeOpts);
 			if (!decoded) {
 				console.log(`Unknown error: ${data.slice(0, 10)}...`);
 				return;
@@ -117,10 +126,13 @@ export { formatError, logError } from "./format/formatter.js";
 export type {
 	AbiErrorItem,
 	DecodedError,
+	DecodeRevertOptions,
 	DecoderOptions,
 	ErrorRegistryEntry,
 	FormattedError,
+	ShortStringResolveFn,
 	SolidityErrorABI,
 	SolidityErrorInput,
 } from "./types.js";
 export { BUILTIN_ERRORS, PANIC_CODES } from "./types.js";
+export { createShortStringResolver } from "./helpers/shortStringResolver.js";

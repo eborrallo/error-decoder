@@ -49,8 +49,9 @@
 		"lint": "tsc --noEmit",
 		"format": "biome format --write .",
 		"format:check": "biome check .",
-		"example:generate": "node dist/cli/generate.js generate --foundry ./example-contracts/out --output ./example/generated --contracts",
-		"example": "tsx example/run.ts",
+		"example:generate": "npm run generate:short-codes && node dist/cli/generate.js generate --foundry ./example-contracts/out --output ./example/generated --contracts",
+		"generate:short-codes": "tsx src/cli/generate.ts generate-short-codes --input ./example-contracts/src/ProtocolErrorCodes.sol,./example-contracts/src/FileLevelErrorCodes.sol --output ./example/generated/shortStringCodes.ts",
+		"example": "tsx --tsconfig example/tsconfig.json example/run.ts",
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [

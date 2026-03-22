@@ -2,172 +2,153 @@
 // Do not edit manually
 
 export interface DeadlineExpiredError {
-	name: "DeadlineExpired";
-	args: {
-		deadline: bigint;
-		currentTime: bigint;
-	};
+  name: "DeadlineExpired";
+  args: {
+    deadline: bigint;
+    currentTime: bigint;
+  };
 }
 
 export interface InsufficientLiquidityError {
-	name: "InsufficientLiquidity";
-	args: {
-		pool: `0x${string}`;
-		required: bigint;
-		available: bigint;
-	};
+  name: "InsufficientLiquidity";
+  args: {
+    pool: `0x${string}`;
+    required: bigint;
+    available: bigint;
+  };
 }
 
 export interface InvalidPathError {
-	name: "InvalidPath";
-	args: {
-		path: readonly `0x${string}`[];
-	};
+  name: "InvalidPath";
+  args: {
+    path: readonly `0x${string}`[];
+  };
 }
 
 export interface PairNotFoundError {
-	name: "PairNotFound";
-	args: {
-		tokenA: `0x${string}`;
-		tokenB: `0x${string}`;
-	};
+  name: "PairNotFound";
+  args: {
+    tokenA: `0x${string}`;
+    tokenB: `0x${string}`;
+  };
 }
 
 export interface PriceImpactTooHighError {
-	name: "PriceImpactTooHigh";
-	args: {
-		impactBps: bigint;
-		maxBps: bigint;
-	};
+  name: "PriceImpactTooHigh";
+  args: {
+    impactBps: bigint;
+    maxBps: bigint;
+  };
 }
 
 export interface SwapFailedError {
-	name: "SwapFailed";
-	args: {
-		reason: `0x${string}`;
-	};
+  name: "SwapFailed";
+  args: {
+    reason: `0x${string}`;
+  };
 }
 
 export interface BorrowCapExceededError {
-	name: "BorrowCapExceeded";
-	args: {
-		token: `0x${string}`;
-		cap: bigint;
-		totalBorrowed: bigint;
-	};
+  name: "BorrowCapExceeded";
+  args: {
+    token: `0x${string}`;
+    cap: bigint;
+    totalBorrowed: bigint;
+  };
 }
 
 export interface CollateralNotSupportedError {
-	name: "CollateralNotSupported";
-	args: {
-		token: `0x${string}`;
-	};
+  name: "CollateralNotSupported";
+  args: {
+    token: `0x${string}`;
+  };
 }
 
 export interface HealthFactorTooLowError {
-	name: "HealthFactorTooLow";
-	args: {
-		positionId: bigint;
-		healthFactor: bigint;
-		minHealthFactor: bigint;
-	};
+  name: "HealthFactorTooLow";
+  args: {
+    positionId: bigint;
+    healthFactor: bigint;
+    minHealthFactor: bigint;
+  };
 }
 
 export interface LiquidationNotAllowedError {
-	name: "LiquidationNotAllowed";
-	args: {
-		positionId: bigint;
-		healthFactor: bigint;
-	};
+  name: "LiquidationNotAllowed";
+  args: {
+    positionId: bigint;
+    healthFactor: bigint;
+  };
 }
 
 export interface OracleStaleError {
-	name: "OracleStale";
-	args: {
-		oracle: `0x${string}`;
-		lastUpdate: bigint;
-		maxAge: bigint;
-	};
+  name: "OracleStale";
+  args: {
+    oracle: `0x${string}`;
+    lastUpdate: bigint;
+    maxAge: bigint;
+  };
 }
 
 export interface PositionNotFoundError {
-	name: "PositionNotFound";
-	args: {
-		positionId: bigint;
-	};
+  name: "PositionNotFound";
+  args: {
+    positionId: bigint;
+  };
 }
 
 export interface RepayExceedsDebtError {
-	name: "RepayExceedsDebt";
-	args: {
-		positionId: bigint;
-		repayAmount: bigint;
-		debt: bigint;
-	};
+  name: "RepayExceedsDebt";
+  args: {
+    positionId: bigint;
+    repayAmount: bigint;
+    debt: bigint;
+  };
 }
 
 export interface InsufficientBalanceError {
-	name: "InsufficientBalance";
-	args: {
-		user: `0x${string}`;
-		requested: bigint;
-		available: bigint;
-	};
+  name: "InsufficientBalance";
+  args: {
+    user: `0x${string}`;
+    requested: bigint;
+    available: bigint;
+  };
 }
 
 export interface InvalidTokenError {
-	name: "InvalidToken";
-	args: {
-		token: `0x${string}`;
-	};
+  name: "InvalidToken";
+  args: {
+    token: `0x${string}`;
+  };
 }
 
 export interface SlippageExceededError {
-	name: "SlippageExceeded";
-	args: {
-		expected: bigint;
-		actual: bigint;
-		maxSlippage: bigint;
-	};
+  name: "SlippageExceeded";
+  args: {
+    expected: bigint;
+    actual: bigint;
+    maxSlippage: bigint;
+  };
 }
 
 export interface UnauthorizedError {
-	name: "Unauthorized";
-	args: {
-		caller: `0x${string}`;
-		required: `0x${string}`;
-	};
+  name: "Unauthorized";
+  args: {
+    caller: `0x${string}`;
+    required: `0x${string}`;
+  };
 }
 
 export interface VaultLockedError {
-	name: "VaultLocked";
-	args: {
-		unlockTime: bigint;
-	};
+  name: "VaultLocked";
+  args: {
+    unlockTime: bigint;
+  };
 }
 
 export interface ZeroAmountError {
-	name: "ZeroAmount";
-	args: Record<string, never>;
+  name: "ZeroAmount";
+  args: Record<string, never>;
 }
 
-export type SolidityCustomError =
-	| DeadlineExpiredError
-	| InsufficientLiquidityError
-	| InvalidPathError
-	| PairNotFoundError
-	| PriceImpactTooHighError
-	| SwapFailedError
-	| BorrowCapExceededError
-	| CollateralNotSupportedError
-	| HealthFactorTooLowError
-	| LiquidationNotAllowedError
-	| OracleStaleError
-	| PositionNotFoundError
-	| RepayExceedsDebtError
-	| InsufficientBalanceError
-	| InvalidTokenError
-	| SlippageExceededError
-	| UnauthorizedError
-	| VaultLockedError
-	| ZeroAmountError;
+export type SolidityCustomError = DeadlineExpiredError | InsufficientLiquidityError | InvalidPathError | PairNotFoundError | PriceImpactTooHighError | SwapFailedError | BorrowCapExceededError | CollateralNotSupportedError | HealthFactorTooLowError | LiquidationNotAllowedError | OracleStaleError | PositionNotFoundError | RepayExceedsDebtError | InsufficientBalanceError | InvalidTokenError | SlippageExceededError | UnauthorizedError | VaultLockedError | ZeroAmountError;

@@ -8,7 +8,7 @@
  * Extend both public and wallet clients — every revert is decoded.
  *
  * Prerequisites:
- *   pnpm example:generate
+ *   pnpm example:generate   (includes generate-short-codes for SHORT_STRING_ERROR_CODES)
  *
  * Run:
  *   npx tsx example/viem_run.ts
@@ -25,6 +25,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
+import { createShortStringResolver } from "../src/index.js";
 import { DecodedRevertError, errorDecoder } from "../src/viem/index.js";
 
 import {
@@ -33,9 +34,14 @@ import {
 	ERROR_ABI,
 	LendingABI,
 	LendingBytecode,
+	SHORT_STRING_ERROR_CODES,
 	VaultABI,
 	VaultBytecode,
 } from "./generated/index.js";
+
+const resolveShortStringMessage = createShortStringResolver(
+	SHORT_STRING_ERROR_CODES,
+);
 
 const deployer = privateKeyToAccount(
 	"0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
@@ -55,7 +61,10 @@ async function main() {
 	console.log(`\nAnvil → ${url}`);
 
 	const transport = http(url);
-	const plugin = errorDecoder({ errorAbis: [ERROR_ABI] });
+	const plugin = errorDecoder({
+		errorAbis: [ERROR_ABI],
+		resolveShortStringMessage,
+	});
 
 	// ── Extend BOTH clients — all reverts are now auto-decoded ──
 
@@ -108,6 +117,57 @@ async function main() {
 		console.log(`Vault   → ${vaultAddr}`);
 		console.log(`DEX     → ${dexAddr}`);
 		console.log(`Lending → ${lendingAddr}`);
+
+		// ── Error(string) short codes (library + file-level constants) ──
+
+		console.log("\n--- Error(string) short codes (plugin + generated map) ---\n");
+
+		const shortDemos = [
+			{
+				label: "Vault.demoShortStringProtocol — A1 → ErrorText1",
+				address: vaultAddr,
+				abi: VaultABI,
+				fn: "demoShortStringProtocol" as const,
+			},
+			{
+				label: "DEX.demoShortStringFileLevel — P1 → PlainErrorText1",
+				address: dexAddr,
+				abi: DEXABI,
+				fn: "demoShortStringFileLevel" as const,
+			},
+			{
+				label: "Lending.demoShortStringProtocol2 — A2 → ErrorText2",
+				address: lendingAddr,
+				abi: LendingABI,
+				fn: "demoShortStringProtocol2" as const,
+			},
+		] as const;
+
+		for (const d of shortDemos) {
+			try {
+				console.log(`${d.label}`);
+				await client.simulateContract({
+					address: d.address,
+					abi: [...d.abi],
+					functionName: d.fn as any,
+					args: [],
+					account: deployer.address,
+				});
+				console.log("  (did not revert — unexpected)\n");
+			} catch (err) {
+				if (err instanceof DecodedRevertError) {
+					const { message, _shortStringDescription } = err.decoded.args as {
+						message?: string;
+						_shortStringDescription?: string;
+					};
+					console.log(
+						`  ✗ ${err.decoded.name}: message=${JSON.stringify(message)} short=${_shortStringDescription}\n`,
+					);
+				} else {
+					throw err;
+				}
+			}
+		}
 
 		// ── Happy path ──
 
